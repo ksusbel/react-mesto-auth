@@ -1,0 +1,11 @@
+.popup__overflow {
+    background: #000000;
+    margin: 0;
+    z-index: 1;
+    position: fixed;
+    overflow: auto;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}

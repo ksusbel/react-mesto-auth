@@ -1,0 +1,16 @@
+.elements__heart {
+  background-image: url("../../../images/Vector_hard.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 22px;
+  height: 19px;
+  align-self: center;
+  cursor: pointer;
+  border: none;
+  background-color: #fff;
+  margin: 0;
+}
+
+.elements__heart:hover {
+  opacity: 0.5;
+}

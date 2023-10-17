@@ -1,0 +1,26 @@
+.popup__form-save {
+  width: 100%;
+  height: 46px;
+  background-color: #000;
+  color: #fff;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  font-family: "Inter", Arial, sans-serif;
+  border: 1px solid #000;
+  border-radius: 2px;
+  cursor: pointer;
+  margin: 15px 0 0 0;
+}
+
+@media screen and (min-width: 768px) {
+  .popup__form-save {
+      height: 50px;
+      font-size: 18px;
+      line-height: 22px;
+  }
+}
+
+.popup__form-save:hover {
+  opacity: 0.8;
+}

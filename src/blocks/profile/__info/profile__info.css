@@ -1,0 +1,9 @@
+.profile__info {
+  justify-self: center;
+}
+
+@media screen and (min-width: 768px) {
+  .profile__info {
+      justify-self: start;
+  }
+}

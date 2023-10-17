@@ -1,0 +1,7 @@
+.popup__form-save_disabled, .popup__form-save_disabled:hover {
+    background-color: #fff;
+    color: #000;
+    opacity: 0.2;
+    pointer-events: none;
+    user-select: none;
+}

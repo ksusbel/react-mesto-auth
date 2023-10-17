@@ -1,0 +1,19 @@
+.elements__dell {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  background-image: url("../../../images/dell.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 18px;
+  height: 19px;
+  align-self: center;
+  cursor: pointer;
+  border: 0;
+  outline: none;
+  background-color: transparent;
+}
+
+.elements__dell:hover {
+  opacity: 0.6;
+}
