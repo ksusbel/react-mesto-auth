@@ -1,0 +1,7 @@
+.popup__message_type_unsuccess {
+    background-image: url(../../../../images/unsuccess.svg);
+    background-repeat: no-repeat;
+    background-position: top center;
+    height: 120px;
+    width: 120px;
+}

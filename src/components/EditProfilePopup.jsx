@@ -2,13 +2,13 @@ import React from "react";
 import PopupWithForm from "./PopupWithForm";
 import CurrentUserContext from "../contexts/CurrentUserContext";
 
-function EditProfilePopup({ isOpen, onClose, onUpdateUser, isDataLoad }) {
-    const [profileName, setProfileName] = React.useState("");
-    const [profileJob, setProfileJob] = React.useState("");
+function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
+    const [profileName, setProfileName] = React.useCallback(React.useState(""));
+    const [profileJob, setProfileJob] = React.useCallback(React.useState(""));
 
     const currentUser = React.useContext(CurrentUserContext);
 
-    const { name, about } = currentUser;
+    const { name, about } = React.useCallback(currentUser);
 
     function handleChangeName(evt) {
         setProfileName(evt.target.value);

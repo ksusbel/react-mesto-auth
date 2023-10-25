@@ -6,7 +6,7 @@ function PopupWithForm({ isOpen, onClose, name, title, children, onSubmit }) {
             <div className="popup__overflow popup__overflow_background_light"></div>
             <div className="popup__container">
                 <button type="button" aria-label="Закрыть" className="popup__close" onClick={onClose}></button>
-                <form className="popup__form" id="popup_form_edit" name={`${name}`} onSubmit={onSubmit} noValidate>
+                <form className="popup__form" name={`${name}`} onSubmit={onSubmit} noValidate>
                     <h2 className="popup__form-title">{title}</h2>
                     {children}
                     <input type="submit" className="popup__form-save" value="Сохранить" />

@@ -1,22 +1,37 @@
 import React from "react";
+import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
 import ImagePopup from "./ImagePopup";
 import CurrentUserContext from "../contexts/CurrentUserContext";
-import api from "../utils/api";
+
 import AddPlacePopup from "./AddPlacePopup";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 
+import ProtectedRoute from "./ProtectedRoute";
+import Login from "./Login";
+import Register from "./Register";
+import InfoTooltip from "./InfoTooltip";
+
+import api from "../utils/api";
+import * as userAuth from "../utils/auth";
+import { withRouter } from "./withRouter";
+
 function App() {
-    const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
-    const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
-    const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
-    const [selectedCard, setSelectedCard] = React.useState({});
-    const [currentUser, setCurrentUser] = React.useState({});
-    const [cards, setCards] = React.useState([]);
+    const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useCallback(React.useState(false));
+    const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useCallback(React.useState(false));
+    const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useCallback(React.useState(false));
+    const [selectedCard, setSelectedCard] = React.useCallback(React.useState({}));
+    const [currentUser, setCurrentUser] = React.useCallback(React.useState({}));
+    const [cards, setCards] = React.useCallback(React.useState([]));
+    const [loggedIn, setLoggedIn] = React.useCallback(React.useState(false));
+    const [registrationSuccess, setRegistrationSuccess] = React.useCallback(React.useState(false));
+    const [userEmail, setUserEmail] = React.useCallback(React.useState(""));
+    const [infoTooltip, setInfoTooltip] = React.useCallback(React.useState(null));
+    const navigate = React.useCallback(useNavigate());
 
     React.useEffect(() => {
         api.getUserInfo()
@@ -39,19 +54,23 @@ function App() {
     }, []);
 
     function handleEditAvatarClick() {
-        setIsEditAvatarPopupOpen(!isEditAvatarPopupOpen);
+        setIsEditAvatarPopupOpen(true);
     }
 
     function handleEditProfileClick() {
-        setIsEditProfilePopupOpen(!isEditProfilePopupOpen);
+        setIsEditProfilePopupOpen(true);
     }
 
     function handleAddPlaceClick() {
-        setIsAddPlacePopupOpen(!isAddPlacePopupOpen);
+        setIsAddPlacePopupOpen(true);
     }
 
     function handleCardClick(selectedCard) {
         setSelectedCard(selectedCard);
+    }
+
+    function handleShowInfoTooltip() {
+        setInfoTooltip(true);
     }
 
     function closeAllPopups() {
@@ -59,6 +78,7 @@ function App() {
         setIsAddPlacePopupOpen(false);
         setIsEditAvatarPopupOpen(false);
         setSelectedCard({});
+        setInfoTooltip(false);
     }
 
     function handleUpdateUser(newUserInfo) {
@@ -119,19 +139,96 @@ function App() {
             });
     }
 
+    React.useEffect(() => {
+        const jwt = localStorage.getItem("token");
+        if (jwt) {
+            userAuth
+                .getContent(jwt)
+                .then((data) => {
+                    setUserEmail(data.data.email);
+                    setLoggedIn(true);
+                    navigate("/");
+                })
+                .catch((err) => {
+                    console.log(`Ошибка: ${err}`);
+                });
+        }
+    }, [navigate]);
+
+    const onRegister = ({ password, email }) => {
+        return userAuth.register({ password, email }).then((res) => {
+            //   console.log(res.message);
+
+            if (res.error === "Пользователь с таким email уже зарегистрирован") {
+                setRegistrationSuccess(false);
+                handleShowInfoTooltip();
+                console.log("Пользователь с таким email уже зарегистрирован");
+                return res;
+            } else {
+                setRegistrationSuccess(true);
+                handleShowInfoTooltip();
+                navigate("/sign-in");
+            }
+        });
+    };
+
+    const onLogin = (data) => {
+        return userAuth.authorize(data).then((data) => {
+            //         console.log(data.message);
+            if (!data.token) {
+                setRegistrationSuccess(false);
+                handleShowInfoTooltip();
+                console.log("Неправильные имя пользователя или пароль");
+            }
+            if (data.token) {
+                setLoggedIn(true);
+                localStorage.setItem("token", data.token);
+            }
+        });
+    };
+
+    const onSignOut = () => {
+        localStorage.removeItem("token");
+        setLoggedIn(false);
+        navigate("/sign-in");
+    };
+
     return (
         <div className="page">
             <CurrentUserContext.Provider value={currentUser}>
-                <Header />
-                <Main onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} onEditAvatar={handleEditAvatarClick} onCardClick={handleCardClick} cards={cards} onCardLike={handleCardLike} onCardDelete={handleCardDelete} />
+                <Header loggedIn={loggedIn} email={userEmail} onSignOut={onSignOut} />
+                <Routes>
+                    <Route path="/sign-up" element={<Register onRegister={onRegister} handleShowInfoTooltip={handleShowInfoTooltip} />} />
+                    <Route path="/sign-in" element={<Login onLogin={onLogin} />} />
+                    <Route
+                        path="/"
+                        element={
+                            <ProtectedRoute
+                                loggedIn={loggedIn}
+                                component={Main}
+                                onSignOut={onSignOut}
+                                onEditProfile={handleEditProfileClick}
+                                onAddPlace={handleAddPlaceClick}
+                                onEditAvatar={handleEditAvatarClick}
+                                onCardClick={handleCardClick}
+                                cards={cards}
+                                onCardLike={handleCardLike}
+                                onCardDelete={handleCardDelete}
+                                email={userEmail}
+                            />
+                        }
+                    />
+                    <Route path="*" element={loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />} />
+                </Routes>
                 <Footer />
                 <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
                 <EditProfilePopup onUpdateUser={handleUpdateUser} isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} />
                 <AddPlacePopup onAddCard={handleAddPlaceSubmit} isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} />
                 <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+                <InfoTooltip isOpen={infoTooltip} onClose={closeAllPopups} isSuccess={registrationSuccess} />
             </CurrentUserContext.Provider>
         </div>
     );
 }
 
-export default App;
+export default withRouter(App);

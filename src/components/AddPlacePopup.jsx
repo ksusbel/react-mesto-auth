@@ -2,8 +2,8 @@ import React from "react";
 import PopupWithForm from "./PopupWithForm";
 
 function AddPlacePopup({ isOpen, onClose, onAddCard }) {
-    const [placeName, setPlaceName] = React.useState("");
-    const [placeLink, setPlaceLink] = React.useState("");
+    const [placeName, setPlaceName] = React.useCallback(React.useState(""));
+    const [placeLink, setPlaceLink] = React.useCallback(React.useState(""));
 
     function handleChangePlaceName(evt) {
         setPlaceName(evt.target.value);
