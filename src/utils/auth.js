@@ -1,3 +1,5 @@
+import { getResponse } from "./utils";
+
 export const BASE_URL = "https://auth.nomoreparties.co";
 
 export const register = ({ password, email }) => {
@@ -8,14 +10,7 @@ export const register = ({ password, email }) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ password, email }),
-    })
-        .then((response) => {
-            return response.json();
-        })
-        .then((res) => {
-            return res;
-        })
-        .catch((err) => console.log(err));
+    }).then((res) => getResponse(res));
 };
 
 export const authorize = ({ password, email }) => {
@@ -26,9 +21,7 @@ export const authorize = ({ password, email }) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ password, email }),
-    })
-        .then((response) => response.json())
-        .catch((err) => console.log(err));
+    }).then((res) => getResponse(res));
 };
 
 export const getContent = (token) => {
@@ -39,5 +32,5 @@ export const getContent = (token) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-    }).then((res) => res.json());
+    }).then((res) => getResponse(res));
 };

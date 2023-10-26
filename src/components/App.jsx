@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 
 import Header from "./Header";
@@ -21,37 +21,17 @@ import * as userAuth from "../utils/auth";
 import { withRouter } from "./withRouter";
 
 function App() {
-    const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useCallback(React.useState(false));
-    const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useCallback(React.useState(false));
-    const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useCallback(React.useState(false));
-    const [selectedCard, setSelectedCard] = React.useCallback(React.useState({}));
-    const [currentUser, setCurrentUser] = React.useCallback(React.useState({}));
-    const [cards, setCards] = React.useCallback(React.useState([]));
-    const [loggedIn, setLoggedIn] = React.useCallback(React.useState(false));
-    const [registrationSuccess, setRegistrationSuccess] = React.useCallback(React.useState(false));
-    const [userEmail, setUserEmail] = React.useCallback(React.useState(""));
-    const [infoTooltip, setInfoTooltip] = React.useCallback(React.useState(null));
-    const navigate = React.useCallback(useNavigate());
-
-    React.useEffect(() => {
-        api.getUserInfo()
-            .then((res) => {
-                setCurrentUser(res);
-            })
-            .catch((err) => {
-                console.log(`Ошибка: ${err}`);
-            });
-    }, []);
-
-    React.useEffect(() => {
-        api.getInitialCards()
-            .then((initialCards) => {
-                setCards(initialCards);
-            })
-            .catch((err) => {
-                console.log(`Ошибка: ${err}`);
-            });
-    }, []);
+    const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
+    const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+    const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+    const [selectedCard, setSelectedCard] = useState({});
+    const [currentUser, setCurrentUser] = useState({});
+    const [cards, setCards] = useState([]);
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [registrationSuccess, setRegistrationSuccess] = useState(false);
+    const [userEmail, setUserEmail] = useState("");
+    const [infoTooltip, setInfoTooltip] = useState(null);
+    const navigate = useNavigate();
 
     function handleEditAvatarClick() {
         setIsEditAvatarPopupOpen(true);
@@ -139,59 +119,91 @@ function App() {
             });
     }
 
-    React.useEffect(() => {
-        const jwt = localStorage.getItem("token");
-        if (jwt) {
-            userAuth
-                .getContent(jwt)
+    const onRegister = ({ password, email }) => {
+        return userAuth
+            .register({ password, email })
+            .then(() => {
+                setRegistrationSuccess(true);
+                handleShowInfoTooltip();
+                navigate("/sign-in");
+            })
+            .catch((res) => {
+                setRegistrationSuccess(false);
+                handleShowInfoTooltip();
+                console.log("Пользователь с таким email уже зарегистрирован");
+                return res;
+            });
+    };
+
+    const onLogin = (data) => {
+        return userAuth
+            .authorize(data)
+            .then((data) => {
+                localStorage.setItem("token", data.token);
+                handleTokenCheck();
+                setLoggedIn(true);
+                navigate("/");
+            })
+            .catch((err) => {
+                setRegistrationSuccess(false);
+                handleShowInfoTooltip();
+                console.log("Неправильные имя пользователя или пароль");
+                console.log(`Ошибка: ${err}`);
+                navigate("/sign-in");
+            });
+    };
+
+    useEffect(() => {
+        if (loggedIn) {
+            api.getUserInfo()
                 .then((data) => {
-                    setUserEmail(data.data.email);
-                    setLoggedIn(true);
-                    navigate("/");
+                    setCurrentUser(data);
+                })
+                .catch((err) => {
+                    console.log(`Ошибка: ${err}`);
+                });
+            api.getInitialCards()
+                .then((initialCards) => {
+                    setCards(initialCards);
                 })
                 .catch((err) => {
                     console.log(`Ошибка: ${err}`);
                 });
         }
-    }, [navigate]);
-
-    const onRegister = ({ password, email }) => {
-        return userAuth.register({ password, email }).then((res) => {
-            //   console.log(res.message);
-
-            if (res.error === "Пользователь с таким email уже зарегистрирован") {
-                setRegistrationSuccess(false);
-                handleShowInfoTooltip();
-                console.log("Пользователь с таким email уже зарегистрирован");
-                return res;
-            } else {
-                setRegistrationSuccess(true);
-                handleShowInfoTooltip();
-                navigate("/sign-in");
-            }
-        });
-    };
-
-    const onLogin = (data) => {
-        return userAuth.authorize(data).then((data) => {
-            //         console.log(data.message);
-            if (!data.token) {
-                setRegistrationSuccess(false);
-                handleShowInfoTooltip();
-                console.log("Неправильные имя пользователя или пароль");
-            }
-            if (data.token) {
-                setLoggedIn(true);
-                localStorage.setItem("token", data.token);
-            }
-        });
-    };
+    }, [loggedIn]);
 
     const onSignOut = () => {
         localStorage.removeItem("token");
         setLoggedIn(false);
         navigate("/sign-in");
     };
+
+    const handleTokenCheck = () => {
+        const jwt = localStorage.getItem("token");
+        if (!jwt) {
+            return;
+        }
+        userAuth
+            .getContent(jwt)
+            .then((data) => {
+                setUserEmail(data.data.email);
+                setLoggedIn(true);
+                navigate("/");
+            })
+            .catch((err) => {
+                console.log(`Ошибка: ${err}`);
+            });
+    };
+
+    useEffect(() => {
+        handleTokenCheck();
+    }, []);
+
+    useEffect(() => {
+        if (loggedIn) {
+            navigate("/");
+        }
+    }, [loggedIn]);
 
     return (
         <div className="page">

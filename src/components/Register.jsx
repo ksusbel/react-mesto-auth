@@ -1,11 +1,11 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Register({ onRegister }) {
-    const [email, setEmail] = React.useCallback(React.useState(""));
-    const [password, setPassword] = React.useCallback(React.useState(""));
-    const [error, setError] = React.useCallback(React.useState(""));
-    const navigate = React.useCallback(useNavigate());
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     const resetForm = () => {
         setEmail("");
@@ -19,7 +19,7 @@ function Register({ onRegister }) {
         onRegister({ password, email }).then(resetForm);
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (localStorage.getItem("jwt")) {
             navigate("/");
         }

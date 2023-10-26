@@ -1,11 +1,11 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login({ onLogin }) {
-    const [email, setEmail] = React.useCallback(React.useState(""));
-    const [password, setPassword] = React.useCallback(React.useState(""));
-    const [error, setError] = React.useCallback(React.useState(""));
-    const navigate = React.useCallback(useNavigate());
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     const resetForm = () => {
         setEmail("");
@@ -22,7 +22,7 @@ function Login({ onLogin }) {
             .catch((err) => setError(err.error || "Что-то пошло не так"));
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (localStorage.getItem("token")) {
             navigate("/");
         }
