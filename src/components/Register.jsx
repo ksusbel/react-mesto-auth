@@ -5,7 +5,7 @@ function Register({ onRegister }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate();
+ //   const navigate = useNavigate();
 
     const resetForm = () => {
         setEmail("");
@@ -19,11 +19,11 @@ function Register({ onRegister }) {
         onRegister({ password, email }).then(resetForm);
     };
 
-    useEffect(() => {
+   /*  useEffect(() => {
         if (localStorage.getItem("jwt")) {
             navigate("/");
         }
-    }, []);
+    }, []); */
 
     return (
         <div className="login">

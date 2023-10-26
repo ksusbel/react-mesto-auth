@@ -5,7 +5,7 @@ function Login({ onLogin }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate();
+ //   const navigate = useNavigate();
 
     const resetForm = () => {
         setEmail("");
@@ -18,15 +18,15 @@ function Login({ onLogin }) {
 
         onLogin({ password, email })
             .then(resetForm)
-            .then(() => navigate("/"))
+          //  .then(() => navigate("/"))
             .catch((err) => setError(err.error || "Что-то пошло не так"));
     };
 
-    useEffect(() => {
+   /*  useEffect(() => {
         if (localStorage.getItem("token")) {
             navigate("/");
         }
-    }, []);
+    }, []); */
 
     return (
         <div className="login">

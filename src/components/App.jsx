@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 
 import Header from "./Header";
@@ -178,7 +178,7 @@ function App() {
         navigate("/sign-in");
     };
 
-    const handleTokenCheck = () => {
+    const handleTokenCheck = useCallback(() => {
         const jwt = localStorage.getItem("token");
         if (!jwt) {
             return;
@@ -193,7 +193,7 @@ function App() {
             .catch((err) => {
                 console.log(`Ошибка: ${err}`);
             });
-    };
+    });
 
     useEffect(() => {
         handleTokenCheck();
