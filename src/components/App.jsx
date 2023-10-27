@@ -138,9 +138,11 @@ function App() {
     const onLogin = (data) => {
         return userAuth
             .authorize(data)
-            .then((data) => {
-                localStorage.setItem("token", data.token);
-                handleTokenCheck();
+            .then((res) => {
+                localStorage.setItem("token", res.token);
+            //    handleTokenCheck();
+                setUserEmail(data.email);
+            //    console.log(data.email);
                 setLoggedIn(true);
                 navigate("/");
             })
