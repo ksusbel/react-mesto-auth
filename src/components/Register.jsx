@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Register({ onRegister }) {
     const [email, setEmail] = useState("");
@@ -15,7 +15,6 @@ function Register({ onRegister }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         onRegister({ password, email }).then(resetForm);
     };
 
